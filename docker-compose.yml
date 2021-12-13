@@ -5,5 +5,7 @@ services:
     go-app:
         restart: always
         build: .
+        volumes:
+          - ./:/app
         ports:
             - "1323:1323"

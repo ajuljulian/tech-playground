@@ -1,6 +1,9 @@
 # Set the base image of our image
 FROM golang:1.17
 
+ARG app_env
+ENV APP_ENV $app_env
+
 # Create a /app directory inside our container that will hold the
 # application source files
 RUN mkdir /app
@@ -20,4 +23,11 @@ RUN go mod download
 RUN go build -o main .
 
 # Start the executable
-CMD ["/app/main"]
+
+CMD if [ ${APP_ENV} = production ]; \
+	then \
+	main; \
+	else \
+	go get github.com/pilu/fresh && \
+	fresh; \
+	fi

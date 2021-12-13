@@ -123,5 +123,5 @@ func getVisits(c echo.Context) error {
 		panic(err)
 	}
 
-	return c.String(http.StatusOK, "visit count: "+val)
+	return c.String(http.StatusOK, "current visit count: "+val)
 }
