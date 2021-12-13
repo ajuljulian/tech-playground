@@ -1,9 +1,8 @@
 package main
 
 import (
-	"io"
+	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/labstack/echo/v4/middleware"
 
@@ -14,15 +13,15 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
+// Redis
 var ctx = context.Background()
-
 var rdb = redis.NewClient(&redis.Options{
 	Addr:     "redis-server:6379",
 	Password: "", // no password set
 	DB:       0,  // use default DB
 })
 
-type Person struct {
+type User struct {
 	Name  string `json:"name" xml:"name" form:"name" query:"name"`
 	Email string `json:"email" xml:"email" form:"email" query:"email`
 }
@@ -45,28 +44,62 @@ func main() {
 
 	e.GET("/visits", getVisits)
 
+	e.GET("/users", allUsers)
 	e.GET("/users/:id", getUser)
-	e.GET("/show", show)
 	e.POST("/users", saveUser)
-	e.POST("/save", save)
-
-	e.POST("/employees", savePerson)
+	e.PUT("/users/:id", updateUser)
+	e.DELETE("/users/:id", deleteUser)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }
 
+func getVisits(c echo.Context) error {
+
+	_, err := rdb.Incr(ctx, "visits").Result()
+	if err != nil {
+		panic(err)
+	}
+
+	val, err := rdb.Get(ctx, "visits").Result()
+	if err != nil {
+		panic(err)
+	}
+
+	return c.String(http.StatusOK, "current visit count: "+val)
+}
+
+func allUsers(c echo.Context) error {
+	return c.String(http.StatusOK, "All Users endpoint hit")
+}
+
 func getUser(c echo.Context) error {
 	id := c.Param("id")
-	return c.String(http.StatusOK, id)
+	s := fmt.Sprintf("Retrieve user with id %s", id)
+	return c.String(http.StatusOK, s)
 }
 
 func saveUser(c echo.Context) error {
 	// Get name and email
 	name := c.FormValue("name")
 	email := c.FormValue("email")
-	return c.String(http.StatusOK, "name:"+name+", email:"+email)
+	s := fmt.Sprintf("Add new user with name: %s and email: %s", name, email)
+	return c.String(http.StatusOK, s)
 }
 
+func updateUser(c echo.Context) error {
+	id := c.Param("id")
+	name := c.FormValue("name")
+	email := c.FormValue("email")
+	s := fmt.Sprintf("Update user with id: %s, set name to %s and email to %s", id, name, email)
+	return c.String(http.StatusOK, s)
+}
+
+func deleteUser(c echo.Context) error {
+	id := c.Param("id")
+	return c.String(http.StatusOK, "Delete User with id:"+id)
+}
+
+/*
 func show(c echo.Context) error {
 	team := c.QueryParam("team")
 	member := c.QueryParam("member")
@@ -110,18 +143,4 @@ func savePerson(c echo.Context) error {
 	}
 	return c.JSON(http.StatusCreated, person)
 }
-
-func getVisits(c echo.Context) error {
-
-	_, err := rdb.Incr(ctx, "visits").Result()
-	if err != nil {
-		panic(err)
-	}
-
-	val, err := rdb.Get(ctx, "visits").Result()
-	if err != nil {
-		panic(err)
-	}
-
-	return c.String(http.StatusOK, "current visit count: "+val)
-}
+*/
