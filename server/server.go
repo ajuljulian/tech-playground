@@ -3,36 +3,47 @@ package main
 import (
 	"fmt"
 	"net/http"
-
-	"github.com/labstack/echo/v4/middleware"
+	"os"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 
 	"context"
 
 	"github.com/go-redis/redis/v8"
+
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 // Redis
 var ctx = context.Background()
 var rdb = redis.NewClient(&redis.Options{
-	Addr:     "redis-server:6379",
+	Addr:     os.Getenv("REDIS_HOST") + ":" + os.Getenv("REDIS_PORT"),
 	Password: "", // no password set
 	DB:       0,  // use default DB
 })
 
+// Postgres
+var db *gorm.DB
+
 type User struct {
+	gorm.Model
 	Name  string `json:"name" xml:"name" form:"name" query:"name"`
 	Email string `json:"email" xml:"email" form:"email" query:"email`
 }
 
 func main() {
 
+	// Set up the database
+	initialMigration()
+
 	err := rdb.Set(ctx, "visits", "0", 0).Err()
 	if err != nil {
 		panic(err)
 	}
 
+	// Set up routes etc.
 	e := echo.New()
 
 	e.Use(middleware.Logger())
@@ -69,34 +80,75 @@ func getVisits(c echo.Context) error {
 }
 
 func allUsers(c echo.Context) error {
-	return c.String(http.StatusOK, "All Users endpoint hit")
+	var users []User
+	db.Find(&users)
+	fmt.Printf("All Users endpoint hit: %v", users)
+	return c.JSON(http.StatusOK, users)
 }
 
 func getUser(c echo.Context) error {
 	id := c.Param("id")
-	s := fmt.Sprintf("Retrieve user with id %s", id)
-	return c.String(http.StatusOK, s)
+	fmt.Printf("Retrieve user with id %s", id)
+	var user User
+	db.First(&user, id)
+	return c.JSON(http.StatusOK, user)
 }
 
 func saveUser(c echo.Context) error {
-	// Get name and email
 	name := c.FormValue("name")
 	email := c.FormValue("email")
-	s := fmt.Sprintf("Add new user with name: %s and email: %s", name, email)
-	return c.String(http.StatusOK, s)
+
+	user := User{Name: name, Email: email}
+	db.Create(&user)
+
+	fmt.Printf("Add new user with name: %s and email: %s", name, email)
+	return c.JSON(http.StatusOK, user)
 }
 
 func updateUser(c echo.Context) error {
 	id := c.Param("id")
 	name := c.FormValue("name")
 	email := c.FormValue("email")
-	s := fmt.Sprintf("Update user with id: %s, set name to %s and email to %s", id, name, email)
-	return c.String(http.StatusOK, s)
+
+	var user User
+	db.First(&user, id)
+	user.Name = name
+	user.Email = email
+
+	fmt.Printf("Update user with id: %s, set name to %s and email to %s", id, name, email)
+	db.Save(&user)
+	return c.JSON(http.StatusOK, user)
 }
 
 func deleteUser(c echo.Context) error {
 	id := c.Param("id")
-	return c.String(http.StatusOK, "Delete User with id:"+id)
+
+	db.Delete(&User{}, id)
+	fmt.Printf("Deleted user with id: %s", id)
+	return c.String(http.StatusOK, "ok")
+}
+
+func initialMigration() {
+	host := os.Getenv("PGHOST")
+	user := os.Getenv("PGUSER")
+	database := os.Getenv("PGDATABASE")
+	password := os.Getenv("PGPASSWORD")
+	port := os.Getenv("PGPORT")
+
+	//dsn := "host=localhost user=gorm password=gorm dbname=gorm port=9920 sslmode=disable TimeZone=Asia/Shanghai"
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=UTC", host, user, password, database, port)
+
+	var err error
+	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		fmt.Println(err.Error())
+		panic("failed to connect to database")
+	}
+	fmt.Printf("db: %v", db)
+
+	// Migrate the schema
+	db.AutoMigrate(&User{})
+
 }
 
 /*
