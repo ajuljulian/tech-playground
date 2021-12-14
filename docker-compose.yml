@@ -9,9 +9,11 @@ services:
     redis-server:
         image: 'redis'
     server:
+        build:
+            dockerfile: Dockerfile
+            context: ./server
         restart: always
-        build: .
         volumes:
-          - ./:/app
+          - ./server:/app
         ports:
             - "1323:1323"

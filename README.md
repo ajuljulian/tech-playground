@@ -1,3 +1,7 @@
+go get github.com/labstack/echo/v4
+go get github.com/go-redis/redis/v8
+
+
 build the image:
 ```
 $ docker build -t my-go-app .
