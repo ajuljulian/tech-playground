@@ -11,7 +11,7 @@ class Hello extends Component {
     }
 
     async fetchMessage() {
-        const message = await axios.get('http://localhost:1323/');
+        const message = await axios.get('api/');
         console.log(message);
         this.setState({
             message: message.data
