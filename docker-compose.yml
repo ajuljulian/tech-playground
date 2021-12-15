@@ -8,7 +8,7 @@ services:
           - '5432:5432'
     redis-server:
         image: 'redis'
-    server:
+    api:
         build:
             dockerfile: Dockerfile
             context: ./server
@@ -25,3 +25,13 @@ services:
             - PGPORT=5432
         ports:
             - '1323:1323'
+    client:
+        stdin_open: true
+        build:
+            dockerfile: Dockerfile.dev
+            context: ./client
+        volumes:
+            - /app/node_modules
+            - ./client:/app
+        ports:
+            - '3000:3000'
