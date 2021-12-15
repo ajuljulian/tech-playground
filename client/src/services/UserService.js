@@ -9,7 +9,7 @@ class UserService {
     }
 
     createUser(user) {
-        return axios.post(USER_API_BASE_URL, user)
+        return axios.post(USER_API_BASE_URL, `name=${user.name}&email=${user.email}`);
     }
 
     getUserById(userId) {
@@ -17,7 +17,7 @@ class UserService {
     }
 
     updateUser(user, userId) {
-        return axios.put(USER_API_BASE_URL + '/' + userId, user);
+        return axios.put(USER_API_BASE_URL + '/' + userId, `name=${user.name}&email=${user.email}`);
     }
 
     deleteUser(userId) {
