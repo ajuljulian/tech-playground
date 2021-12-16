@@ -16,22 +16,21 @@ class CreateUserComponent extends Component {
         this.saveOrUpdateUser = this.saveOrUpdateUser.bind(this);
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         if (this.state.id === '_add') {
             return
         }
         else {
-            UserService.getUserById(this.state.id).then( (res) => {
-                let user = res.data;
-                this.setState({
-                    name: user.name,
-                    email: user.email
-                });
+            let res = await UserService.getUserById(this.state.id)
+            let user = res.data;
+            this.setState({
+                name: user.name,
+                email: user.email
             });
         }
     }
 
-    saveOrUpdateUser = (e) => {
+    async saveOrUpdateUser(e) {
         e.preventDefault();
         let user = {
             name: this.state.name,
@@ -41,14 +40,12 @@ class CreateUserComponent extends Component {
         console.log('user => ' + JSON.stringify(user));
 
         if (this.state.id === '_add') {
-            UserService.createUser(user).then(res => {
-                this.props.history.push('/users');
-            });
+            await UserService.createUser(user)
+            this.props.history.push('/users');
         }
         else {
-            UserService.updateUser(user, this.state.id).then(res => {
-                this.props.history.push('/users');
-            });
+            await UserService.updateUser(user, this.state.id)
+            this.props.history.push('/users');
         }
     }
 

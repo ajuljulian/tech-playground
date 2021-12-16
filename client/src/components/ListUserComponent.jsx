@@ -13,15 +13,16 @@ class ListUserComponent extends Component {
         this.deleteUser = this.deleteUser.bind(this);
     }
 
-    deleteUser(id){
-        UserService.deleteUser(id).then( res => {
-            this.setState({users: this.state.users.filter(user => user.ID !== id)});
-        });
+    async deleteUser(id){
+        await UserService.deleteUser(id)
+        this.setState({users: this.state.users.filter(user => user.ID !== id)});
     }
+
     viewUser(id){
         console.log('viewUser with id:' + id);
         this.props.history.push(`/view-user/${id}`);
     }
+    
     editUser(id){
         this.props.history.push(`/add-user/${id}`);
     }

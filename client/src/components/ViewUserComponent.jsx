@@ -12,10 +12,9 @@ class ViewUserComponent extends Component {
         }
     }
 
-    componentDidMount(){
-        UserService.getUserById(this.state.id).then( res => {
-            this.setState({user: res.data});
-        });
+    async componentDidMount() {
+        let res = await UserService.getUserById(this.state.id)
+        this.setState({user: res.data});
     }
 
     render() {
@@ -27,7 +26,7 @@ class ViewUserComponent extends Component {
                     <div className = "card-body">
                         <div className = "row">
                             <label>User Name:</label>
-                            <div> { this.state.user.name }</div>
+                            <div>{ this.state.user.name }</div>
                         </div>
                         <div className = "row">
                             <label>User Email:</label>
