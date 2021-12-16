@@ -40,17 +40,13 @@ class ListUserComponent extends Component {
         return (
             <div>
                  <h2 className="text-center">User List</h2>
-                 <div className = "row">
-                    <button className="btn btn-primary" onClick={this.addUser}>Add User</button>
-                 </div>
-                 <br></br>
-                 <div className = "row">
-                        <table className = "table table-striped table-bordered">
+                 <div className="row mt-5">
+                        <table className="table table-striped table-bordered">
 
                             <thead>
                                 <tr>
-                                    <th>User Name</th>
-                                    <th>User Email</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -58,9 +54,9 @@ class ListUserComponent extends Component {
                                 {
                                     this.state.users.map(
                                         user => 
-                                        <tr key = {user.ID}>
-                                             <td> {user.name} </td>   
-                                             <td> {user.email}</td>
+                                        <tr key={user.ID}>
+                                             <td>{user.name}</td>   
+                                             <td>{user.email}</td>
                                              <td>
                                                  <button onClick={ () => this.editUser(user.ID)} className="btn btn-info">Update</button>
                                                  <button style={{marginLeft: "10px"}} onClick={ () => this.deleteUser(user.ID)} className="btn btn-danger">Delete</button>
@@ -72,6 +68,11 @@ class ListUserComponent extends Component {
                             </tbody>
                         </table>
 
+                 </div>
+                 <div className="row">
+                     <div className="d-grid gap-2 col-6 mx-auto">
+                        <button className="btn btn-primary" onClick={this.addUser}>Add User</button>
+                    </div>
                  </div>
 
             </div>
