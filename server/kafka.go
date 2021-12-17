@@ -15,13 +15,20 @@ const (
 )
 
 func testKafka() {
+	// Wait a bit before trying to connect to Kafka. Even though I am launching
+	// everything through docker-compose and I am making the Go app container
+	// dependent on Kafka, it does not seem to work and I don't know why.
+	timer1 := time.NewTimer(10 * time.Second)
+
+	<-timer1.C
+
 	// create a new context
 	ctx := context.Background()
 	// produce messages in a new go routine, since
 	// both the produce and consume functions are
 	// blocking
 	go produce(ctx)
-	consume(ctx)
+	go consume(ctx)
 }
 
 func produce(ctx context.Context) {

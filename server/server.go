@@ -34,7 +34,6 @@ type User struct {
 }
 
 func main() {
-
 	// Set up the database
 	initialMigration()
 
@@ -74,6 +73,9 @@ func getVisits(c echo.Context) error {
 	if err != nil {
 		panic(err)
 	}
+
+	// Test Kafka. Use a goroutine to not block the main thread.
+	go testKafka()
 
 	val, err := rdb.Get(ctx, "visits").Result()
 	if err != nil {
