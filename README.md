@@ -29,17 +29,20 @@ $ docker-compose down
 
 ### What it does
 
-I'm using the [Echo](https://echo.labstack.com) module to expose a `User` service.
+* Expose a `User` service using the [Echo](https://echo.labstack.com) module
 
-I'm using the [Gorm](https://gorm.io) ORM module to persist users.
+* Persisting users to a Postgres database using the [Gorm](https://gorm.io) ORM module
 
-I'm using the [Go-Redis](https://github.com/go-redis/redis) Redis client to connect to a redis cluster.
+* Connecting to a redis cluster using the [Go-Redis](https://github.com/go-redis/redis) Redis client
+
+* Reading and wring to a Kafka topic using the [Kafka-Go](https://github.com/segmentio/kafka-go) module 
 
 ### Third-party modules
 ```
 go get github.com/labstack/echo/v4
 go get github.com/go-redis/redis/v8
 go get -u gorm.io/gorm
+go get github.com/segmentio/kafka-go 
 ```
 
 ## Client
@@ -56,17 +59,25 @@ Postgres database
 
 ## Redis
 
-Redis cluster
+Create a redis cluster to be used by other containers
 
 ## Nginx
 
 Nginx for web serving/routing etc.
 
+## Zookeeper
+
+Used with Kafka
+
+## Kafka
+
+Create a kafka broker to be used by other containers
+
 # Next Steps
 
-1. Add Redis for cache
-1. Add Kafka
 1. Add Flink
+1. Add CI/CD using Travis
+1. Deploy to AWS Elastic Beanstalk
 1. Deploy using Kubernetes
 
 # Docker Commands

@@ -38,6 +38,9 @@ func main() {
 	// Set up the database
 	initialMigration()
 
+	// Test Kafka. Use a goroutine to not block the main thread.
+	go testKafka()
+
 	err := rdb.Set(ctx, "visits", "0", 0).Err()
 	if err != nil {
 		panic(err)
