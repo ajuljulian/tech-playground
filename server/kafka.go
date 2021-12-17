@@ -24,7 +24,8 @@ func testKafka() {
 
 	// create a new context
 	ctx := context.Background()
-	// produce messages in a new go routine, since
+
+	// produce and consume messages in a go routine, since
 	// both the produce and consume functions are
 	// blocking
 	go produce(ctx)
@@ -48,7 +49,7 @@ func produce(ctx context.Context) {
 		err := w.WriteMessages(ctx, kafka.Message{
 			Key: []byte(strconv.Itoa(i)),
 			// create an arbitrary message payload for the value
-			Value: []byte("this is message" + strconv.Itoa(i)),
+			Value: []byte("this is message " + strconv.Itoa(i)),
 		})
 		if err != nil {
 			panic("could not write message " + err.Error())
